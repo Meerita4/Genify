@@ -1,19 +1,19 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import OpenAI from 'openai';
+import Groq from 'groq-sdk';
 
 @Injectable()
 export class AiService {
-  private client: OpenAI;
+  private client: Groq;
 
   constructor(private config: ConfigService) {
-    this.client = new OpenAI({ apiKey: this.config.get<string>('OPENAI_API_KEY') });
+    this.client = new Groq({ apiKey: this.config.get<string>('GROQ_API_KEY') });
   }
 
   async generate(prompt: string): Promise<string> {
     try {
       const response = await this.client.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: 'llama-3.3-70b-versatile',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 1000,
         temperature: 0.8,
@@ -27,7 +27,7 @@ export class AiService {
   async streamGenerate(prompt: string, onChunk: (chunk: string) => void): Promise<void> {
     try {
       const stream = await this.client.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: 'llama-3.3-70b-versatile',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 1000,
         temperature: 0.8,
